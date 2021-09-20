@@ -220,3 +220,52 @@ def append_pot2(img):
   img = append_blackborder(img,new_height,new_width)
   #print('An image with shape'+str(img.shape)+'has been created')
   return img
+
+def reduce_number_imgs_num(imgs,label_imgs,num_patches=1,normalize=True,imagenet=False):
+    """
+    Input:
+    imgs:a list or tensor containing several images to be packed as a list after reducing its number
+    label_imgs: a list or tensor containing several label images in the same order as the imgs tensor
+    percentage_data: float(0-1) indicating the reduction in labels to be performed i.e 1 means that all the image will be taken into account
+    normalize: Boolean indicating whether or not to perform a normalization step in the img, no normalization is performed in the labels as it is supposed that they would already been in a binary 
+    Output:
+    x: list containing a subset of imgs
+    y:list containing a subset of labels
+    """
+    n=len(imgs)
+    if imagenet:
+      if normalize:
+        
+        idx=random.sample(list(range(0,n)),int(num_patches))
+        x= [cv2.normalize(imgs[i]/np.max(imgs[i]), None, 0, 1, cv2.NORM_MINMAX) for i in idx] 
+        y= [label_imgs[i] for i in idx] 
+      else:
+        idx=random.sample(list(range(0,n)),int(num_patches))
+        x= [color.gray2rgb(imgs[i]) for i in idx] 
+        y= [label_imgs[i] for i in idx] 
+    else:
+      if normalize:
+        
+        idx=random.sample(list(range(0,n)),int(num_patches))
+        x= [cv2.normalize(imgs[i]/np.max(imgs[i]), None, 0, 1, cv2.NORM_MINMAX) for i in idx] 
+        y= [label_imgs[i] for i in idx] 
+      else:
+        idx=random.sample(list(range(0,n)),int(num_patches))
+        x= [imgs[i] for i in idx] 
+        y= [label_imgs[i] for i in idx] 
+    print('Created list with '+str(len(x))+' images')
+   
+    return x,y
+
+def create_consecutive_partitions(partitions,train_img_patches,train_lbl_patches):
+  consecutive_x=[]
+  consecutive_y=[]
+  temp_x,temp_y=reduce_number_imgs_num(train_img_patches,train_lbl_patches,num_patches=partitions[0],normalize=False)
+  consecutive_x.append(temp_x)
+  consecutive_y.append(temp_y)
+  for i in partitions[1:]: 
+    temp_x,temp_y=reduce_number_imgs_num(temp_x,temp_y,num_patches=i,normalize=False)
+    consecutive_x.append(temp_x)
+    consecutive_y.append(temp_y)
+  return consecutive_x,consecutive_y
+
