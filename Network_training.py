@@ -16,13 +16,23 @@ import tensorflow as tf
 import numpy as np
 def train(X_train,Y_train,X_val,Y_val,numEpochs,output_channels,patience,lr,min_lr,batch_size_value,schedule,model_name,optimizer_name,loss_acronym,max_pooling,train_encoder=True,random_encoder_weights=True,preTrain=False,Denoising=False,pre_load_weights=False,pretrained_model=None,plot_history=False,seg_weights=[1.,1.,5.],bottleneck_freezing=False,save_best_only=True):
   """Inputs:
+        --------------------
+        DATA:
+        X_train(tensor):contaning the training patches to be augmented 
+        Y_train(tensor):contaning the training labels to be augmented 
+        X_val(tensor):contaning the validation patches to be augmented 
+        Y_val(tensor):contaning the validation labels to be augmented 
+        ---------------------
+        HYPERPARAMS:
         numEpochs(int):number of "loops" of training
+        output_channels(int):number of predictions to be performed by the last activation layer ( if it's bigger than 1 a softmax activation is used instead of a sigmoid)
         patience(int): number of "loops" without improvement till the training is stopped, in the case of reduce till the lr is reduced to its half
         lr(float): number indicating the lr starting value// in the case of oneCycle the max lr
+        min_lr(float):minimum lr at which the schedulers should stop reducing it
         batch_size_value(int):number of images in each step of training inside an epoch
         schedule(string):indicating the variations performed in the lr during the training #'oneCycle' # 'reduce' # None
-        model_name(string):indicating the architecture to be used #'UNet','ResUNet','MobileNetEncoder'
-        loss_acronym(string): indicating the name of the loss function to be applied 'BCE', 'Dice', 'W_BCE_Dice','CCE','SEG','mae'
+        model_name(string):indicating the architecture to be used #'UNet','ResUNet','MobileNetEncoder','AttentionNet'
+        loss_acronym(string): indicating the name of the loss function to be applied 'BCE', 'Dice', 'W_BCE_Dice','CCE','SEG','mae','mse'
         optimizer_name(string):indicating the kind of optimized to be used 'Adam', 'SGD'
         max_pooling(boolean):indicating True if max_pooling must be performed, False if average pooling has to be performed
         preTrain(boolean):indicating whether we're preTraining with denoising the network or training it for the final task
